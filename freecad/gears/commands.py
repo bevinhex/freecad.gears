@@ -23,7 +23,7 @@ import os
 import FreeCAD
 import FreeCADGui as Gui
 from .features import ViewProviderGear, InvoluteGear, InvoluteGearRack
-from .features import CycloideGear, BevelGear, CrownGear, WormGear, TimingGear, LanternGear
+from .features import CycloideGear, BevelGear, CrownGear, WormGear, TimingGear, LanternGear, HypoCycloidGear
 
 
 class BaseCommand(object):
@@ -51,17 +51,18 @@ class BaseCommand(object):
     def create(cls):
         obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", cls.NAME)
         cls.GEAR_FUNCTION(obj)
-        ViewProviderGear(obj.ViewObject)
+        if FreeCAD.GuiUp:
+            ViewProviderGear(obj.ViewObject)
 
-        # borrowed from threaded profiles
-        # puts the gear into an active container
-        body = Gui.ActiveDocument.ActiveView.getActiveObject("pdbody")
-        part = Gui.ActiveDocument.ActiveView.getActiveObject("part")
+            # borrowed from threaded profiles
+            # puts the gear into an active container
+            body = Gui.ActiveDocument.ActiveView.getActiveObject("pdbody")
+            part = Gui.ActiveDocument.ActiveView.getActiveObject("part")
 
-        if body:
-            body.Group += [obj]
-        elif part:
-            part.Group += [obj]
+            if body:
+                body.Group += [obj]
+            elif part:
+                part.Group += [obj]
         return obj
 
     def GetResources(self):
@@ -108,6 +109,13 @@ class CreateBevelGear(BaseCommand):
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'bevelgear.svg')
     MenuText = 'Bevel gear'
     ToolTip = 'Create a Bevel gear'
+
+class CreateHypoCycloidGear(BaseCommand):
+    NAME = "hypocycloidgear"
+    GEAR_FUNCTION = HypoCycloidGear
+    Pixmap = os.path.join(BaseCommand.ICONDIR, 'hypocycloidgear.svg')
+    MenuText = 'HypoCycloid gear'
+    ToolTip = 'Create a HypoCycloid gear with its pins'
 
 
 class CreateWormGear(BaseCommand):
